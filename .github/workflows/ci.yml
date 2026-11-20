@@ -1,0 +1,37 @@
+
+name: Cineva CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - feature/tubagus-athalla
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php-validation:
+    name: PHP Syntax Validation
+    runs-on: [self-hosted, linux, x64]
+
+    steps:
+      - name: Checkout Cineva Repository
+        uses: actions/checkout@v4
+
+      - name: Check Docker Version
+        run: docker --version
+
+      - name: Validate PHP Syntax
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/app" \
+            -w /app \
+            php:8.2-cli \
+            sh -c "find . -type f -name '*.php' -not -path './.git/*' -print0 | xargs -0 -r -n1 php -l"
+
+      - name: Pipeline Completed
+        run: echo "Cineva CI Pipeline completed successfully!"
+
